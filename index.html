@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GPU & NVIDIA Study Guide | Ranjit Kumar Rudra</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@300;400;500&display=swap');
+:root{--green:#76b900;--green-bright:#9dda00;--black:#080808;--card:#0f0f0f;--card2:#141414;--border:#1e1e1e;--border2:#2a2a2a;--text:#e6e6e6;--muted:#777;--muted2:#555;--red:#ff4444;--blue:#4488ff;--orange:#ff8800;--yellow:#ffcc00;}
+*{margin:0;padding:0;box-sizing:border-box;}html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--text);font-family:'Outfit',system-ui,sans-serif;font-size:15px;line-height:1.8;overflow-x:hidden;font-weight:300;}
+.hero{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:80px 24px;position:relative;background:radial-gradient(ellipse at 50% 60%,rgba(118,185,0,0.07) 0%,transparent 70%);}
+.hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(118,185,0,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(118,185,0,0.04) 1px,transparent 1px);background-size:60px 60px;}
+.hero-tag{font-family:'Fira Code',monospace;font-size:11px;letter-spacing:4px;color:var(--green);text-transform:uppercase;margin-bottom:20px;opacity:0;animation:fadeUp 0.7s 0.2s forwards;}
+.hero-title{font-family:'Outfit',sans-serif;font-size:clamp(48px,10vw,100px);font-weight:800;line-height:1;color:var(--text);opacity:0;animation:fadeUp 0.7s 0.4s forwards;letter-spacing:-2px;}
+.hero-title span{color:var(--green);}
+.hero-sub{font-size:clamp(14px,2vw,17px);color:var(--muted);margin-top:20px;max-width:560px;opacity:0;animation:fadeUp 0.7s 0.6s forwards;font-weight:300;letter-spacing:0.2px;}
+.hero-badges{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:40px;opacity:0;animation:fadeUp 0.7s 0.8s forwards;}
+.badge{padding:6px 16px;border:1px solid var(--border2);border-radius:20px;font-family:'Fira Code',monospace;font-size:11px;color:var(--muted);letter-spacing:1px;}
+.badge.green{border-color:rgba(118,185,0,0.4);color:var(--green);}
+.search-wrap{position:sticky;top:0;z-index:200;background:rgba(8,8,8,0.97);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;gap:12px;align-items:center;}
+.search-input{flex:1;background:var(--card);border:1px solid var(--border2);border-radius:6px;padding:10px 16px;color:var(--text);font-family:'Fira Code',monospace;font-size:13px;outline:none;transition:border-color 0.2s;}
+.search-input:focus{border-color:var(--green);}
+.search-input::placeholder{color:var(--muted2);}
+.search-count{font-family:'Fira Code',monospace;font-size:11px;color:var(--muted);white-space:nowrap;}
+.nav{background:var(--card);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;gap:0;position:sticky;top:57px;z-index:100;}
+.nav::-webkit-scrollbar{display:none;}
+.nav-btn{padding:12px 20px;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);font-family:'Fira Code',monospace;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;white-space:nowrap;}
+.nav-btn:hover,.nav-btn.active{color:var(--green);border-bottom-color:var(--green);}
+.page{max-width:900px;margin:0 auto;padding:60px 24px;}
+.sec-header{margin-bottom:48px;}
+.sec-num{font-family:'Fira Code',monospace;font-size:10px;letter-spacing:3px;color:var(--green);text-transform:uppercase;margin-bottom:10px;}
+.sec-title{font-family:'Outfit',sans-serif;font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1;color:var(--text);letter-spacing:-1px;}
+.sec-title span{color:var(--green);}
+.sec-desc{margin-top:12px;color:var(--muted);font-style:italic;max-width:600px;}
+.correction{background:rgba(255,68,68,0.08);border:1px solid rgba(255,68,68,0.3);border-radius:8px;padding:16px 20px;margin-bottom:16px;font-family:'Fira Code',monospace;font-size:12px;color:#ff8888;line-height:1.7;}
+.correction strong{color:var(--red);}
+.update-banner{background:rgba(118,185,0,0.08);border:1px solid rgba(118,185,0,0.25);border-radius:8px;padding:16px 20px;margin-bottom:20px;font-family:'Fira Code',monospace;font-size:12px;color:#aad060;line-height:1.7;}
+.update-banner strong{color:var(--green);}
+.concept{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:28px 32px;margin-bottom:20px;transition:all 0.4s;opacity:0;transform:translateY(16px);}
+.concept.visible{opacity:1;transform:translateY(0);}
+.concept:hover{border-color:var(--border2);}
+.concept.highlight{border-color:rgba(118,185,0,0.3);}
+.concept-label{font-family:'Fira Code',monospace;font-size:10px;letter-spacing:2px;color:var(--green);text-transform:uppercase;margin-bottom:10px;}
+.concept-title{font-family:'Outfit',sans-serif;font-size:20px;font-weight:600;color:var(--text);margin-bottom:10px;letter-spacing:-0.3px;}
+.concept-body{color:var(--muted);font-size:14px;line-height:1.8;font-weight:300;}
+.concept-body strong{color:var(--text);}
+.code{background:#0a0a0a;border:1px solid var(--border2);border-radius:6px;padding:16px 20px;font-family:'Fira Code',monospace;font-size:12px;line-height:1.8;color:#aaa;margin:16px 0;overflow-x:auto;white-space:pre;}
+.g{color:var(--green);}.y{color:var(--yellow);}.b{color:var(--blue);}.r{color:var(--red);}.o{color:var(--orange);}.w{color:var(--text);}
+.tbl-wrap{overflow-x:auto;margin:20px 0;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{font-family:'Fira Code',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border2);white-space:nowrap;}
+td{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--muted);vertical-align:top;font-size:13px;font-family:'Outfit',sans-serif;font-weight:300;}
+td:first-child{color:var(--text);font-family:'Fira Code',monospace;font-size:12px;}
+tr:hover td{background:rgba(118,185,0,0.02);}
+.yes{color:var(--green);}.no{color:var(--muted2);}.star{color:var(--yellow);}.new{color:var(--orange);}
+.quote{border-left:3px solid var(--green);padding:20px 24px;margin:24px 0;background:rgba(118,185,0,0.04);border-radius:0 6px 6px 0;font-size:15px;color:var(--text);font-weight:300;letter-spacing:0.1px;}
+.quote cite{display:block;margin-top:10px;font-family:'Fira Code',monospace;font-size:11px;color:var(--green);font-style:normal;letter-spacing:1px;}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:20px 0;}
+.flashcard{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:28px;cursor:pointer;user-select:none;transition:all 0.3s;margin-bottom:12px;}
+.flashcard:hover{border-color:rgba(118,185,0,0.3);}
+.flashcard-q{font-family:'Outfit',sans-serif;font-size:16px;font-weight:600;color:var(--text);margin-bottom:4px;letter-spacing:-0.2px;}
+.flashcard-hint{font-family:'Fira Code',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;}
+.flashcard-a{display:none;margin-top:16px;padding-top:16px;border-top:1px solid var(--border);color:var(--muted);font-size:14px;line-height:1.8;}
+.flashcard-a.show{display:block;}
+.flashcard-a strong{color:var(--green);}
+hr{border:none;border-top:1px solid var(--border);margin:0;}
+.footer{background:var(--card);border-top:1px solid var(--border);padding:48px 24px;text-align:center;}
+.footer-title{font-family:'Outfit',sans-serif;font-size:28px;font-weight:800;color:var(--green);margin-bottom:8px;letter-spacing:-0.5px;}
+.footer-sub{font-size:13px;color:var(--muted);font-style:italic;}
+.progress-wrap{position:fixed;bottom:24px;right:24px;z-index:300;background:var(--card);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;font-family:'Fira Code',monospace;font-size:11px;color:var(--muted);}
+.progress-bar{width:100px;height:3px;background:var(--border2);border-radius:2px;margin-top:6px;overflow:hidden;}
+.progress-fill{height:100%;background:var(--green);border-radius:2px;width:0%;transition:width 0.1s;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+::-webkit-scrollbar{width:4px;height:4px;}::-webkit-scrollbar-track{background:var(--black);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+@media(max-width:600px){.page{padding:40px 16px;}.concept{padding:20px;}}
+</style>
+</head>
+<body>
+
+<section class="hero">
+<div class="hero-tag">GPU & NVIDIA — Complete Study Guide</div>
+<div class="hero-title">Master<br><span>GPU Computing</span></div>
+<div class="hero-sub">A deep dive into GPU architecture, NVIDIA history, and AI computing — from fundamentals to Vera Rubin 2026.</div>
+<div class="hero-badges">
+
+<span class="badge">12 Core Concepts</span>
+<span class="badge">Hopper · Blackwell · Rubin</span>
+<span class="badge">H200 Specific</span>
+</div>
+</section>
+
+<div class="search-wrap">
+<input class="search-input" type="text" placeholder="Search anything — GPU, CUDA, Tensor Core, HBM, Warp..." id="searchBox" oninput="doSearch()">
+<span class="search-count" id="searchCount"></span>
+</div>
+
+<nav class="nav">
+
+<button class="nav-btn active" onclick="jumpTo('l1')">GPU vs CPU</button>
+<button class="nav-btn" onclick="jumpTo('l2')">History</button>
+<button class="nav-btn" onclick="jumpTo('l3')">Arch vs Gen</button>
+<button class="nav-btn" onclick="jumpTo('l4')">Identify GPU</button>
+<button class="nav-btn" onclick="jumpTo('l5')">Chip vs GPU</button>
+<button class="nav-btn" onclick="jumpTo('l6')">Chip Families</button>
+<button class="nav-btn" onclick="jumpTo('l7')">Fermi to Hopper</button>
+<button class="nav-btn" onclick="jumpTo('l8')">Performance</button>
+<button class="nav-btn" onclick="jumpTo('l9')">Precision</button>
+<button class="nav-btn" onclick="jumpTo('l10')">Compute Cap</button>
+<button class="nav-btn" onclick="jumpTo('l11')">Whitepapers</button>
+<button class="nav-btn" onclick="jumpTo('l12')">Volta Deep Dive</button>
+<button class="nav-btn" onclick="jumpTo('updated')">2024-2026 Architectures</button>
+<button class="nav-btn" onclick="jumpTo('flashcards')">Flashcards</button>
+</nav>
+
+
+
+<section id="l1">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Chapter 01</div>
+<div class="sec-title">GPU <span>vs</span> CPU</div>
+<div class="sec-desc">The foundational concept — why GPUs exist and when they win over CPUs.</div>
+</div>
+
+<div class="concept highlight visible">
+<div class="concept-label">The Master Analogy</div>
+<div class="concept-title">CPU = Few World-Class Surgeons | GPU = Army of Assistants</div>
+<div class="concept-body">For complex sequential decisions requiring expertise, surgeons win. For mass parallel repetitive work, the army wins. AI training is firmly army territory — billions of independent matrix multiplications running simultaneously.</div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>Property</th><th>CPU</th><th>GPU</th></tr></thead>
+<tbody>
+<tr><td>Core Count</td><td>8-64 powerful ALUs</td><td>Thousands of smaller cores (H100: 16,896)</td></tr>
+<tr><td>Clock Speed</td><td>3-4 GHz</td><td>765 MHz - 1.5 GHz (data center)</td></tr>
+<tr><td>Optimised For</td><td>Sequential tasks, low latency</td><td>Parallel tasks, high throughput</td></tr>
+<tr><td>Memory</td><td>DDR5 RAM, large cache hierarchy</td><td>HBM3e, ultra-high bandwidth</td></tr>
+<tr><td>Cache Levels</td><td>L1, L2, L3</td><td>L0 instruction, L1 per SM, L2 whole GPU</td></tr>
+</tbody>
+</table></div>
+
+<div class="concept visible">
+<div class="concept-label">The Critical Insight</div>
+<div class="concept-title">Dependent vs Independent Instructions</div>
+<div class="code"><span class="g">DEPENDENT — CPU WINS (must execute sequentially)</span>
+<span class="w">R1 = R2 + R3      </span><span class="y">step 1</span>
+<span class="w">R4 = R1 x R5      </span><span class="r">MUST WAIT — uses R1 from step 1</span>
+<span class="w">R6 = R4 / R7      </span><span class="r">MUST WAIT — uses R4 from step 2</span>
+<span class="y">1000 dependent instructions = 1000 cycles even on a GPU</span>
+
+<span class="g">INDEPENDENT — GPU WINS (run all at once)</span>
+<span class="w">R1 = R2 + R3      </span><span class="b">all three run simultaneously</span>
+<span class="w">R4 = R5 x R6      </span><span class="b">on different cores</span>
+<span class="w">R7 = R8 / R9      </span><span class="b">in one cycle</span>
+<span class="g">1000 independent instructions = 1 cycle on 1000 GPU cores</span></div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">GPU Hardware Hierarchy</div>
+<div class="concept-title">4 Levels: GPU → SM → Partition → Execution Units</div>
+<div class="code"><span class="g">GPU (entire card)</span>
+<span class="w">  └── </span><span class="y">SMs (Streaming Multiprocessors)</span><span class="w"> ← most important unit</span>
+<span class="w">      └── </span><span class="b">Partitions</span><span class="w"> (4 per SM in Volta+)</span>
+<span class="w">          └── </span><span class="o">Execution Units</span>
+<span class="w">              ├── CUDA Cores (FP32, FP64, INT)</span>
+<span class="w">              ├── Tensor Cores (matrix math / AI)</span>
+<span class="w">              ├── Special Function Units (log, sin, cos)</span>
+<span class="w">              ├── Load/Store Units</span>
+<span class="w">              ├── Warp Scheduler + Dispatcher</span>
+<span class="w">              └── Register File</span>
+<span class="g">L1 Cache = inside each SM | L2 Cache = shared across entire GPU</span></div>
+</div>
+
+<div class="quote">"GPUs are NOT better than CPUs in all circumstances. CPUs win on sequential dependent workloads. GPUs win on massively parallel independent workloads. The myth that GPUs are universally better is exactly that — a myth."<cite>— GPU Computing Fundamentals</cite></div>
+</div>
+</section>
+<hr>
+
+<section id="l2">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Chapter 02</div>
+<div class="sec-title">NVIDIA <span>History</span></div>
+<div class="sec-desc">From a Denny's conversation in 1992 to the world's most valuable company in 2025.</div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>Spec</th><th>NV1 (1993)</th><th>RTX 4090 (2022)</th><th>Increase</th></tr></thead>
+<tbody>
+<tr><td>Cores</td><td>1</td><td>~16,384</td><td class="star">16,000x</td></tr>
+<tr><td>Memory</td><td>2 MB</td><td>24 GB</td><td class="star">12,000x</td></tr>
+<tr><td>Speed</td><td>75 MHz</td><td>~2,520 MHz</td><td class="star">34x</td></tr>
+</tbody>
+</table></div>
+
+<div class="concept visible">
+<div class="concept-label">Key Milestones</div>
+<div class="concept-title">1992 to 2026</div>
+<div class="code"><span class="g">1992</span>  <span class="w">Late 1992 — Jensen Huang, Malachowsky, Priem meet at Dennys, East San Jose</span>
+<span class="g">1993</span>  <span class="w">April 5 — NVIDIA incorporated. $40K seed. $20M VC from Sequoia + Sutter Hill</span>
+<span class="g">1995</span>  <span class="w">NV1 launches — fails commercially (DirectX incompatibility with quad texturing)</span>
+<span class="g">1997</span>  <span class="y">RIVA 128 — 1 million units in 4 months. First real market success.</span>
+<span class="g">1999</span>  <span class="y">GeForce 256 — coined term GPU, hardware T&L. IPO at $12 per share.</span>
+<span class="g">2000</span>  <span class="w">3dfx acquisition $70M — eliminates biggest competitor</span>
+<span class="g">2001</span>  <span class="w">Original Xbox graphics contract</span>
+<span class="g">2006</span>  <span class="g">CUDA launched — THE inflection point. Opens GPU to general computing.</span>
+<span class="g">2012</span>  <span class="g">AlexNet trained on 2x GTX 580 GPUs — AI revolution ignited.</span>
+<span class="g">2016</span>  <span class="w">Pascal P100, DGX-1. Jensen personally delivers first DGX-1 to OpenAI.</span>
+<span class="g">2017</span>  <span class="y">Volta V100 — first Tensor Cores. 8x AI performance leap over Pascal.</span>
+<span class="g">2019</span>  <span class="w">Mellanox acquisition $6.9B — owns GPU and InfiniBand networking stack</span>
+<span class="g">2022</span>  <span class="y">Hopper H100 — Transformer Engine, FP8. LLM era begins.</span>
+<span class="g">2023</span>  <span class="g">$1 TRILLION market cap June. Annual revenue $44B.</span>
+<span class="g">2024</span>  <span class="g">Blackwell launched. $2T Feb, $3T June, $4T July. Revenue $130B.</span>
+<span class="g">2025</span>  <span class="g">$5 TRILLION October — first company ever. Revenue $216B (+65% YoY).</span>
+<span class="g">2026</span>  <span class="g">Vera Rubin in production. Q1 revenue $81.6B (+85% YoY).</span></div>
+</div>
+</div>
+</section>
+<hr>
+
+<section id="l3">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Chapter 03</div>
+<div class="sec-title">Architecture <span>vs</span> Generation</div>
+<div class="sec-desc">The distinction that confuses everyone — and the key to understanding all of NVIDIA's product lineup.</div>
+</div>
+
+<div class="concept highlight visible">
+<div class="concept-label">The Golden Rule</div>
+<div class="concept-title">Architecture = HOW it's built | Generation = WHO it's for</div>
+<div class="code"><span class="g">ARCHITECTURE</span><span class="w"> (chip design, named after famous scientists)</span>
+<span class="w">      |</span>
+<span class="w">      ├──> </span><span class="b">Tegra Generation</span><span class="w">     (mobile / embedded / SoC)</span>
+<span class="w">      ├──> </span><span class="y">GeForce Generation</span><span class="w">   (gaming / consumer desktops)</span>
+<span class="w">      ├──> </span><span class="o">Quadro/RTX Generation</span><span class="w"> (professional workstations)</span>
+<span class="w">      └──> </span><span class="g">Tesla Generation</span><span class="w">     (HPC / AI / supercomputers)</span></div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>Generation</th><th>Market</th><th>Examples</th><th>Fan?</th><th>In Top500?</th></tr></thead>
+<tbody>
+<tr><td>Tegra</td><td>Mobile / SoC</td><td>Nintendo Switch, Jetson Orin</td><td class="yes">N/A</td><td class="no">No</td></tr>
+<tr><td>GeForce</td><td>Gaming / Consumer</td><td>RTX 3090, RTX 4090</td><td class="yes">Yes</td><td class="no">No</td></tr>
+<tr><td>Quadro / RTX Pro</td><td>Professional workstations</td><td>RTX 6000 Ada</td><td class="yes">Yes</td><td class="no">Rarely</td></tr>
+<tr><td>Tesla / Data Center</td><td>HPC / AI</td><td>A100, H100, H200, B200</td><td class="no">No</td><td class="yes">Yes</td></tr>
+</tbody>
+</table></div>
+
+<div class="concept visible">
+<div class="concept-label">Best Example — Ampere 2020</div>
+<div class="concept-title">Same Architecture, Two Completely Different Products</div>
+<div class="code"><span class="g">Ampere Architecture (2020)</span>
+<span class="w">├── </span><span class="y">RTX 3090</span><span class="w">  chip GA102 → GeForce generation → Gaming → Has fan</span>
+<span class="w">└── </span><span class="g">A100</span><span class="w">      chip GA100 → Tesla generation  → HPC/AI → No fan</span>
+
+<span class="b">Same design philosophy. Completely different purpose, price, specs.</span></div>
+</div>
+</div>
+</section>
+<hr>
+
+<section id="l4">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Chapter 04</div>
+<div class="sec-title">Identify <span>Any GPU</span></div>
+<div class="sec-desc">Two tools to instantly identify any GPU's architecture, generation, and purpose.</div>
+</div>
+
+<div class="concept highlight visible">
+<div class="concept-label">Tool 1 — TechPowerUp</div>
+<div class="concept-title">GPU Specification Database</div>
+<div class="concept-body"><strong>Search formula on Google:</strong> [GPU NAME] + techpowerup<br><br>
+Returns: chip name, architecture, generation, core counts, memory specs, TDP, compute capability.<br>
+Examples: "A100 techpowerup" gives full A100 specs. "H200 techpowerup" gives full H200 specs.</div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">Tool 2 — The Visual Trick</div>
+<div class="concept-title">Fan = Consumer | No Fan = Data Center HPC</div>
+<div class="code"><span class="g">Has cooling fan?</span>
+<span class="w">├── </span><span class="yes">YES</span><span class="w">  → Consumer GPU (GeForce or Quadro generation)</span>
+<span class="w">│         Used in: desktops, laptops, workstations</span>
+<span class="w">│         Examples: RTX 3090, RTX 4090, RTX 2080</span>
+<span class="w">|</span>
+<span class="w">└── </span><span class="no">NO</span><span class="w">   → HPC GPU (Tesla generation)</span>
+<span class="w">          Used in: supercomputers, DGX servers, cloud AI</span>
+<span class="w">          Examples: A100, H100, </span><span class="g">H200 (YOUR GPU AT UT SYSTEM)</span><span class="w">, B200</span>
+<span class="w">          Why no fan: data center provides robust external cooling</span></div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>GPU Name</th><th>Architecture</th><th>Generation</th><th>Fan</th><th>Your Role?</th></tr></thead>
+<tbody>
+<tr><td>RTX 3090</td><td>Ampere</td><td>GeForce</td><td class="yes">Yes</td><td class="no">No</td></tr>
+<tr><td>A100</td><td>Ampere</td><td>Tesla</td><td class="no">No</td><td class="no">Context</td></tr>
+<tr><td>H100</td><td>Hopper</td><td>Tesla</td><td class="no">No</td><td class="no">Context</td></tr>
+<tr><td style="color:var(--green)">H200 — YOU</td><td>Hopper</td><td>Tesla</td><td class="no">No</td><td class="star">Yes — 95 nodes!</td></tr>
+<tr><td>B200</td><td>Blackwell</td><td>Tesla</td><td class="no">No</td><td class="no">Next gen</td></tr>
+</tbody>
+</table></div>
+</div>
+</section>
+<hr>
+
+<section id="l5">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Chapter 05</div>
+<div class="sec-title">GPU Chip <span>vs</span> GPU</div>
+<div class="sec-desc">The silicon die versus the complete product — critical for reading whitepapers.</div>
+</div>
+
+<div class="concept highlight visible">
+<div class="concept-label">The Analogy</div>
+<div class="concept-title">Chip = Engine Block | GPU = Complete Car</div>
+<div class="code"><span class="g">GPU CHIP</span><span class="w"> = Silicon die only. No memory. No cooling. No ports. Just transistors.</span>
+
+<span class="y">GPU (product)</span><span class="w"> = Chip + HBM Memory + Cooling System + Ports + PCIe interface</span></div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">Naming Convention — G + Architecture Letter + Number</div>
+<div class="concept-title">Chip Names Across All Architectures</div>
+<div class="code"><span class="g">Architecture  Chip Name   GPU Product</span>
+<span class="w">Fermi      →  </span><span class="y">GF</span><span class="w">100    →  GeForce GTX 480</span>
+<span class="w">Kepler     →  </span><span class="y">GK</span><span class="w">110    →  Tesla K80</span>
+<span class="w">Maxwell    →  </span><span class="y">GM</span><span class="w">200    →  Tesla M60</span>
+<span class="w">Pascal     →  </span><span class="y">GP</span><span class="w">100    →  P100</span>
+<span class="w">Volta      →  </span><span class="y">GV</span><span class="w">100    →  V100</span>
+<span class="w">Ampere     →  </span><span class="y">GA</span><span class="w">100    →  A100</span>
+<span class="w">Hopper     →  </span><span class="g">GH</span><span class="g">100    →  H100 and H200 (SAME chip!)</span>
+<span class="w">Blackwell  →  </span><span class="y">GB</span><span class="w">200    →  B200 / B300 (Blackwell Ultra)</span>
+<span class="w">Rubin      →  </span><span class="y">R2</span><span class="w">00     →  R200 (2026 — in production now)</span></div>
+</div>
+
+<div class="update-banner"><strong>Key Fact:</strong> H200 uses the SAME GH100 chip as H100. The upgrade is entirely in the memory subsystem: 141GB HBM3e at 4.8 TB/s versus H100s 80GB HBM3 at 3.35 TB/s. Same compute architecture, same CC 9.0, much more memory bandwidth. This is why H200 excels at large model inference where memory is the bottleneck.</div>
+</div>
+</section>
+<hr>
+
+<section id="l6">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Chapter 06</div>
+<div class="sec-title">Chip <span>Families</span></div>
+<div class="sec-desc">One architecture generates multiple chips for different markets. Lower chip number = higher tier.</div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">Ampere Chip Family</div>
+<div class="concept-title">One Architecture, Five Chips, Two Markets</div>
+<div class="code"><span class="g">Ampere Architecture (2020)</span>
+<span class="w">├── GA100  → HPC/AI     → A100          → </span><span class="no">No fan</span>
+<span class="w">├── GA102  → Gaming     → RTX 3090, 3080 → </span><span class="yes">Has fan</span>
+<span class="w">├── GA102 (v890) → HPC variant          → </span><span class="no">No fan</span>
+<span class="w">├── GA104  → Mid gaming → RTX 3070       → </span><span class="yes">Has fan</span>
+<span class="w">└── GA106  → Entry      → RTX 3060       → </span><span class="yes">Has fan</span>
+
+<span class="g">Lower chip number = higher tier: GA100 (flagship HPC) > GA106 (entry gaming)</span>
+<span class="g">Same chip can have HPC and consumer variants with different version numbers</span></div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">Third-Party Manufacturers</div>
+<div class="concept-title">Consumer vs Data Center GPU Distribution</div>
+<div class="concept-body">NVIDIA licenses chip designs to <strong>ASUS, MSI, Gigabyte</strong> for consumer GPUs — causing minor differences in clock speeds and cooling designs. <strong>Data center GPUs (A100, H100, H200, B200) are NVIDIA-controlled</strong> directly or through DGX partnerships. No third-party versions of data center GPUs exist.</div>
+</div>
+</div>
+</section>
+<hr>
+
+<section id="l7">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Chapter 07</div>
+<div class="sec-title">Fermi <span>to</span> Hopper</div>
+<div class="sec-desc">Every architecture from 2010 to 2022 — innovations, process nodes, and performance.</div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>Architecture</th><th>Year</th><th>Process</th><th>HPC GPU</th><th>Consumer</th><th>Key Innovation</th></tr></thead>
+<tbody>
+<tr><td>Fermi</td><td>2010</td><td>40nm</td><td>Tesla X2070</td><td>GTX 480</td><td>First serious compute GPU</td></tr>
+<tr><td>Kepler</td><td>2012</td><td>28nm</td><td>Tesla K80 (2 chips)</td><td>GTX 780</td><td>Powered AlexNet 2012</td></tr>
+<tr><td>Maxwell</td><td>2014</td><td>28nm</td><td>Tesla M60</td><td>GTX 980 Ti</td><td>Power efficiency leap</td></tr>
+<tr><td>Pascal</td><td>2016</td><td>16/14nm</td><td class="star">P100</td><td>GTX 1080</td><td>NVLink Gen1, HBM2, P100 naming</td></tr>
+<tr><td>Volta</td><td>2017</td><td>12nm</td><td class="star">V100</td><td>—</td><td>FIRST Tensor Cores ever</td></tr>
+<tr><td>Turing</td><td>2018</td><td>12nm</td><td>T4</td><td>RTX 2080</td><td>RT Cores, INT8/INT4 Tensor</td></tr>
+<tr><td>Ampere</td><td>2020</td><td>7nm</td><td class="star">A100</td><td>RTX 3090</td><td>3rd gen Tensor, BF16, MIG</td></tr>
+<tr><td>Hopper</td><td>2022</td><td>4nm</td><td class="star">H100/H200</td><td>—</td><td>Transformer Engine, FP8</td></tr>
+</tbody>
+</table></div>
+
+<div class="concept visible">
+<div class="concept-label">Critical Insight — Always Check Precision</div>
+<div class="concept-title">FP32 vs FP64: HPC vs Consumer Priorities</div>
+<div class="code"><span class="g">Fermi comparison — same generation, very different FP64:</span>
+<span class="w">GTX 480 (consumer):   1.3 TFLOPS FP32  vs  </span><span class="r">168 GFLOPS FP64</span>
+<span class="w">Tesla X2070 (HPC):    1.2 TFLOPS FP32  vs  </span><span class="g">582 GFLOPS FP64</span>
+<span class="w">                                             HPC GPU is 3.5x better at FP64</span>
+
+<span class="y">HPC needs FP64: scientific simulation, climate modelling, physics</span>
+<span class="y">Consumer needs FP32/FP16: games, graphics, most AI training</span>
+<span class="r">NEVER compare TFLOPS without knowing which precision</span></div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">The 315x Improvement</div>
+<div class="concept-title">Fermi to Hopper in 12 Years</div>
+<div class="code"><span class="w">Fermi  2010:   </span><span class="o"> 1.2 TFLOPS FP32</span>
+<span class="w">Kepler 2012:   </span><span class="o"> 4.1 TFLOPS FP32</span>
+<span class="w">Maxwell 2014:  </span><span class="o"> 9.7 TFLOPS FP32</span>
+<span class="w">Pascal  2016:  </span><span class="y">21.2 TFLOPS FP32</span>
+<span class="w">Volta   2017:  </span><span class="y">31.4 TFLOPS FP32 + 125 TFLOPS FP16 Tensor</span>
+<span class="w">Ampere  2020:  </span><span class="g">77.6 TFLOPS FP32 + 312 TFLOPS FP16 Tensor</span>
+<span class="w">Hopper  2022:  </span><span class="g">66.9 TFLOPS FP32 + 3,958 TFLOPS FP8 Tensor (with sparsity)</span>
+<span class="b">Fermi to Hopper FP8 Tensor: over 3,000x improvement</span></div>
+</div>
+</div>
+</section>
+<hr>
+
+<section id="l8">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Chapter 08</div>
+<div class="sec-title">Performance <span>Parameters</span></div>
+<div class="sec-desc">The 4 factors that determine GPU performance. Core count alone means nothing.</div>
+</div>
+
+<div class="grid2">
+<div class="concept visible highlight">
+<div class="concept-label">Parameter 1</div>
+<div class="concept-title">Memory Bandwidth (GB/s or TB/s)</div>
+<div class="concept-body">Bus Width x Memory Speed x Technology = Bandwidth. Bus Width = road lanes. Memory Speed = car speed. Together they determine how much data flows to the cores per second. HBM3e gives the H200 a 4.8 TB/s highway — 13x wider bus than the RTX 3090 despite sharing the Ampere architecture concept.</div>
+</div>
+<div class="concept visible highlight">
+<div class="concept-label">Parameter 2</div>
+<div class="concept-title">Instructions Throughput (TFLOPS)</div>
+<div class="concept-body">Core Count x Core Speed = TFLOPS. Use TFLOPS as a single number — it captures both factors and lets you skip raw core count debates. When reading a whitepaper, go straight to the TFLOPS table by precision (FP64, FP32, FP16, BF16, FP8).</div>
+</div>
+<div class="concept visible highlight">
+<div class="concept-label">Parameter 3</div>
+<div class="concept-title">Energy Consumption (TDP in Watts)</div>
+<div class="concept-body">HPC GPUs deliberately run at lower clock speeds than consumer GPUs to reduce power consumption. Multiplied across 1,000+ nodes in a data center, every watt saved = significant operational cost reduction. Your 95-node DGX cluster is a perfect example of why this matters at scale.</div>
+</div>
+<div class="concept visible highlight">
+<div class="concept-label">Parameter 4</div>
+<div class="concept-title">New Hardware Units / Features</div>
+<div class="concept-body">The biggest performance leaps come from entirely new units, not just more cores. Tensor Cores (Volta 2017) delivered 8x AI performance improvement over Pascal without changing core counts. The Transformer Engine (Hopper 2022) further revolutionised LLM training and inference.</div>
+</div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>Spec</th><th>A100 (HPC Ampere)</th><th>RTX 3090 (Gaming Ampere)</th><th>Ratio</th></tr></thead>
+<tbody>
+<tr><td>Architecture</td><td>Ampere GA100</td><td>Ampere GA102</td><td>Same family</td></tr>
+<tr><td>Memory Type</td><td class="star">HBM2e</td><td>GDDR6X</td><td>HBM = higher BW</td></tr>
+<tr><td>Memory Bus Width</td><td class="star">5,120 bit</td><td>384 bit</td><td class="star">13x wider</td></tr>
+<tr><td>Memory Bandwidth</td><td class="star">2,039 GB/s</td><td>936 GB/s</td><td class="star">2.2x more</td></tr>
+<tr><td>FP32 TFLOPS</td><td>77.6</td><td>35.6</td><td>2.2x more</td></tr>
+<tr><td>FP64 TFLOPS</td><td class="star">19.5</td><td>0.6</td><td class="star">32x more</td></tr>
+<tr><td>Cooling</td><td class="no">Passive (no fan)</td><td class="yes">Active (fan)</td><td>Different env</td></tr>
+</tbody>
+</table></div>
+
+<div class="quote">When asked which GPU is better — the correct answer is: "Better in what context? For AI training throughput look at FP16/BF16 TFLOPS and memory bandwidth. For scientific computing FP64 matters most. For power-constrained data centers look at TFLOPS per watt. The right answer always depends on the workload."<cite>— GPU Architecture Reference</cite></div>
+</div>
+</section>
+<hr>
+
+<section id="l9">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Chapter 09</div>
+<div class="sec-title">Precision <span>and Data Types</span></div>
+<div class="sec-desc">FP64 through FP4 — the complete picture including the latest precision types introduced in Hopper, Blackwell and Rubin.</div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>Type</th><th>Bits</th><th>Pi Precision</th><th>Speed</th><th>Best For</th><th>Introduced</th></tr></thead>
+<tbody>
+<tr><td>FP64</td><td>64</td><td>3.14159265358979</td><td>Slowest</td><td>Scientific computing</td><td>Always</td></tr>
+<tr><td>FP32</td><td>32</td><td>3.1415926</td><td>Medium</td><td>General GPU compute</td><td>Always</td></tr>
+<tr><td>TF32</td><td>19*</td><td>FP32 range</td><td>Fast</td><td>Default Tensor Core (Ampere+)</td><td class="new">Ampere 2020</td></tr>
+<tr><td>BF16</td><td>16</td><td>FP32 range</td><td>Fast</td><td>AI training (safe, no overflow)</td><td class="new">Ampere 2020</td></tr>
+<tr><td>FP16</td><td>16</td><td>3.14</td><td>Fast</td><td>AI training, graphics</td><td>Volta 2017</td></tr>
+<tr><td>INT8</td><td>8</td><td>N/A</td><td>Very fast</td><td>Inference quantization</td><td>Turing 2018</td></tr>
+<tr><td>FP8</td><td>8</td><td>approx 3.1</td><td>Very fast</td><td>AI inference</td><td class="new">Hopper 2022</td></tr>
+<tr><td>FP4</td><td>4</td><td>approx 3</td><td>Fastest</td><td>Inference quantization</td><td class="new">Blackwell 2024</td></tr>
+</tbody>
+</table></div>
+
+<div class="concept visible">
+<div class="concept-label">H100 TFLOPS by Precision — Why Precision Choice Is Everything</div>
+<div class="concept-title">116x More Throughput from the Same Chip</div>
+<div class="code"><span class="g">H100 SXM5 — Your sibling GPU to the H200:</span>
+<span class="w">FP64:                    </span><span class="o"> 34 TFLOPS  </span><span class="w">← scientific computing</span>
+<span class="w">FP32:                    </span><span class="o"> 67 TFLOPS</span>
+<span class="w">TF32 Tensor (dense):     </span><span class="y">494 TFLOPS</span><span class="w"> (989 with sparsity)</span>
+<span class="w">FP16/BF16 Tensor (dense):</span><span class="y">989 TFLOPS</span><span class="w"> (1,979 with sparsity)</span>
+<span class="w">FP8 Tensor (dense):    </span><span class="g">1,979 TFLOPS</span><span class="w"> (3,958 with sparsity)</span>
+
+<span class="b">FP64 to FP8 = 116x more throughput from the SAME chip</span>
+<span class="b">This is why inference workloads use FP8 — massive cost saving per token</span></div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">Execution Speed</div>
+<div class="concept-title">Why FP64 Is Slower Than FP32</div>
+<div class="code"><span class="w">FP32 addition:  </span><span class="y">2 cycles</span>
+<span class="w">FP64 addition:  </span><span class="o">4 cycles</span><span class="w">  (2x slower, 2x more accurate)</span>
+
+<span class="g">Pi represented at different precisions:</span>
+<span class="w">FP16:  3.14                  </span><span class="r">only 2 decimal places</span>
+<span class="w">FP32:  3.1415926             </span><span class="y">7 decimal places</span>
+<span class="w">FP64:  3.14159265358979      </span><span class="g">15 decimal places</span>
+<span class="r">Warning: very small numbers like 0.000001 round to ZERO in FP16</span></div>
+</div>
+</div>
+</section>
+<hr>
+
+<section id="l10">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Chapter 10</div>
+<div class="sec-title">Compute <span>Capability</span></div>
+<div class="sec-desc">NVIDIA's version number system — what features a GPU supports and what CUDA versions it requires.</div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>Architecture</th><th>CC Version</th><th>Min CUDA</th><th>Key Features Unlocked</th></tr></thead>
+<tbody>
+<tr><td>Kepler</td><td>3.x</td><td>5.0+</td><td>Unified memory, dynamic parallelism</td></tr>
+<tr><td>Maxwell</td><td>5.x</td><td>6.5+</td><td>Improved shared memory management</td></tr>
+<tr><td>Pascal</td><td>6.x</td><td>8.0+</td><td>FP16, NVLink Gen1, HBM2</td></tr>
+<tr><td>Volta</td><td>7.0</td><td>9.0+</td><td class="star">Tensor Cores (first ever)</td></tr>
+<tr><td>Turing</td><td>7.5</td><td>10.0+</td><td>RT Cores, INT8/INT4 Tensor</td></tr>
+<tr><td>Ampere</td><td>8.0</td><td>11.0+</td><td>3rd gen Tensor, BF16, TF32, MIG, sparsity</td></tr>
+<tr><td style="color:var(--green)">Hopper — H200 YOU</td><td style="color:var(--green)">9.0</td><td style="color:var(--green)">11.8+</td><td class="star">FP8, Transformer Engine, NVLink 4</td></tr>
+<tr><td>Blackwell</td><td>10.x</td><td>12.x+</td><td class="new">FP4, 5th gen Tensor, NVLink 5</td></tr>
+</tbody>
+</table></div>
+
+<div class="concept visible">
+<div class="concept-label">Your H200 — CC 9.0 Specifics</div>
+<div class="concept-title">What CC 9.0 Unlocks and Requires</div>
+<div class="code"><span class="g">H200 (GH100 chip) — Compute Capability 9.0</span>
+<span class="w">├── Minimum CUDA version: </span><span class="y">11.8</span>
+<span class="w">├── Supports: FP8, Transformer Engine, 4th gen Tensor Cores</span>
+<span class="w">├── BF16, TF32, FP16, INT8 all supported</span>
+<span class="w">├── NVLink 4.0 — 900 GB/s per GPU</span>
+<span class="w">└── </span><span class="r">Running CUDA below 11.8 causes INCOMPATIBILITY ERROR</span>
+
+<span class="g">Quick check command (run on your cluster):</span>
+<span class="b">nvidia-smi --query-gpu=compute_cap --format=csv</span>
+
+<span class="y">When researchers report CUDA errors — first question always:</span>
+<span class="w">"What CUDA toolkit version are you running? H200 requires minimum 11.8"</span></div>
+</div>
+</div>
+</section>
+<hr>
+
+<section id="l11">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Chapter 11</div>
+<div class="sec-title">Reading <span>Whitepapers</span></div>
+<div class="sec-desc">NVIDIA's official technical documents are the authoritative source. Learn the structure once, read all of them.</div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">How to Find Any Whitepaper</div>
+<div class="concept-title">Search Formula: Chip Name + whitepaper</div>
+<div class="code"><span class="g">Google search examples:</span>
+<span class="w">"GH100 whitepaper"  → Hopper (your GPU family)</span>
+<span class="w">"GB200 whitepaper"  → Blackwell</span>
+<span class="w">"GA100 whitepaper"  → Ampere A100</span>
+<span class="w">"GV100 whitepaper"  → Volta V100</span>
+<span class="r">Always look for the PDF from nvidia.com — not articles, not summaries</span></div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">Universal Whitepaper Structure</div>
+<div class="concept-title">Same 4-Section Order in Every NVIDIA Whitepaper</div>
+<div class="code"><span class="g">1. New Features Introduction</span>
+<span class="w">   What is new vs previous generation</span>
+
+<span class="g">2. SM Internal Structure</span><span class="w">  ← THE most important page</span>
+<span class="w">   Detailed diagram: cores, Tensor Cores, memory hierarchy</span>
+
+<span class="g">3. Performance Benchmarks and Comparisons</span>
+<span class="w">   Always vs previous 1-2 generations</span>
+
+<span class="g">4. Technical Specifications Table</span>
+<span class="w">   SM count, cores, memory, bandwidth, TDP, CC version</span></div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">Priority Reading List</div>
+<div class="concept-title">For Your NVIDIA Interviews — Read in This Order</div>
+<div class="code"><span class="star">Priority 1</span><span class="w">  GH100 whitepaper — your hardware, know it inside out</span>
+<span class="star">Priority 1</span><span class="w">  GB200 whitepaper — Blackwell, you will be asked about it</span>
+<span class="star">Priority 2</span><span class="w">  GA100 whitepaper — context for A100 comparisons</span>
+<span class="star">Priority 2</span><span class="w">  GV100 whitepaper — Tensor Core origin story (Volta)</span></div>
+</div>
+</div>
+</section>
+<hr>
+
+<section id="l12">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Chapter 12</div>
+<div class="sec-title">Volta <span>Deep Dive</span></div>
+<div class="sec-desc">Pascal vs Volta vs Ampere master comparison, SM architecture, SIMT, and Tensor Core paradox explained.</div>
+</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>Spec</th><th>Pascal P100</th><th>Volta V100</th><th>Ampere A100</th></tr></thead>
+<tbody>
+<tr><td>Chip</td><td>GP100</td><td>GV100</td><td>GA100</td></tr>
+<tr><td>Transistors</td><td>15B</td><td>21B</td><td class="star">54B</td></tr>
+<tr><td>Process Node</td><td>16nm</td><td>12nm</td><td class="star">7nm</td></tr>
+<tr><td>SM Count</td><td>56</td><td>80</td><td class="star">108</td></tr>
+<tr><td>FP32 Cores</td><td>~3,500</td><td>~5,120</td><td class="star">~6,912</td></tr>
+<tr><td>FP64 Cores</td><td>~1,792</td><td>~2,560</td><td class="star">~3,456</td></tr>
+<tr><td>INT Cores</td><td class="no">None (shared)</td><td class="yes">~5,120 (independent)</td><td class="star">~6,912</td></tr>
+<tr><td>Tensor Cores</td><td class="no">None</td><td class="star">640 — 2nd gen FP16</td><td>432 — 3rd gen (2.5x each)</td></tr>
+<tr><td>L2 Cache</td><td>4 MB</td><td>6 MB</td><td class="star">40 MB (7x jump)</td></tr>
+<tr><td>Memory</td><td>HBM2</td><td>HBM2</td><td class="star">HBM2e</td></tr>
+<tr><td>Memory BW</td><td>~720 GB/s</td><td>~900 GB/s</td><td class="star">~2,039 GB/s</td></tr>
+<tr><td>FP32 TFLOPS</td><td>21</td><td>31</td><td class="star">77.6</td></tr>
+<tr><td>FP16 Tensor</td><td class="no">None</td><td>125 TFLOPS</td><td class="star">312 TFLOPS</td></tr>
+<tr><td>NVLink</td><td>Gen 1, 160 GB/s</td><td>Gen 2, 300 GB/s</td><td class="star">Gen 3, 600 GB/s</td></tr>
+</tbody>
+</table></div>
+
+<div class="concept visible">
+<div class="concept-label">SIMT — The Core of GPU Parallelism</div>
+<div class="concept-title">Single Instruction Multiple Threads</div>
+<div class="code"><span class="g">Vector Addition — the classic SIMT example:</span>
+<span class="w">Vector A: [1, 2, 3, 4, 5...]</span>
+<span class="w">Vector B: [9, 8, 7, 6, 5...]</span>
+
+<span class="g">GPU (SIMT approach):</span>
+<span class="w">Thread 1 adds A[1]+B[1]  all</span>
+<span class="w">Thread 2 adds A[2]+B[2]  run</span>
+<span class="w">Thread 3 adds A[3]+B[3]  simultaneously</span>
+<span class="w">Same INSTRUCTION (add) on different DATA = SIMT</span>
+
+<span class="g">Warp = exactly 32 threads, same instruction, different data elements</span>
+<span class="r">Warp Divergence (if/else inside a warp) = forces serialisation = kills perf</span></div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">The Tensor Core Paradox</div>
+<div class="concept-title">Ampere Has Fewer Tensor Cores But More Throughput</div>
+<div class="code"><span class="w">Volta:   </span><span class="y">640</span><span class="w"> Tensor Cores (2nd gen)  = 125 TFLOPS FP16</span>
+<span class="w">Ampere:  </span><span class="y">432</span><span class="w"> Tensor Cores (3rd gen)  = </span><span class="g">312 TFLOPS FP16</span>
+
+<span class="b">Each Ampere Tensor Core is 2.5x more capable than each Volta Tensor Core</span>
+<span class="r">RULE: NEVER judge by count alone. TFLOPS is the only honest comparison.</span></div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">Volta SM Architecture — First With Tensor Cores</div>
+<div class="concept-title">What Each SM Contains in V100</div>
+<div class="code"><span class="g">V100 — 84 SMs, each SM contains:</span>
+<span class="w">├──  64  FP32 cores  (single precision)</span>
+<span class="w">├──  64  INT32 cores (independent path — NEW in Volta)</span>
+<span class="w">├──  32  FP64 cores  (double precision)</span>
+<span class="w">├──   8  Tensor Cores (FIRST TIME EVER — matrix math for AI)</span>
+<span class="w">├── L0 Instruction Cache (per partition)</span>
+<span class="w">├── Warp Scheduler (the manager)</span>
+<span class="w">├── Dispatcher Unit (the executor)</span>
+<span class="w">├── Register File</span>
+<span class="w">└── 4 Partitions (new in Volta — allows concurrent software blocks)</span>
+
+<span class="g">Key Volta innovations:</span>
+<span class="w">1. 50% more energy efficient SM vs Pascal</span>
+<span class="w">2. Instruction latency: Pascal 6 cycles, Volta 4 cycles, Ampere 2 cycles</span>
+<span class="w">3. First Tensor Cores: 12x throughput for AI training vs no Tensor Cores</span>
+<span class="w">4. Independent INT + FP32 paths (Pascal executed them sequentially)</span>
+<span class="w">5. NVLink Gen 2: 300 GB/s (up from 160 GB/s in Pascal)</span></div>
+</div>
+</div>
+</section>
+<hr>
+
+<section id="updated">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">2024 — 2026</div>
+<div class="sec-title">Blackwell <span>and</span> Rubin</div>
+<div class="sec-desc">Blackwell (2024) and Vera Rubin (2026) — sourced from official NVIDIA announcements and technical publications.</div>
+</div>
+
+<div class="update-banner"><strong>H200 — YOUR GPU (Available 2024):</strong> Same GH100 chip as H100. Entire upgrade is in memory: 141GB HBM3e at 4.8 TB/s versus H100s 80GB HBM3 at 3.35 TB/s. 1.76x more memory, 1.43x more bandwidth. CC 9.0. Min CUDA 11.8. Up to 1.6x better inference than H100 for large LLMs. Up to 2x better throughput for GPT-3 175B with 8 GPUs.</div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>Spec</th><th>H100 (2022)</th><th>H200 (2024)</th><th>B200 (2024)</th><th>R200 Rubin (2026)</th></tr></thead>
+<tbody>
+<tr><td>Architecture</td><td>Hopper</td><td>Hopper</td><td>Blackwell</td><td class="new">Rubin</td></tr>
+<tr><td>Chip</td><td>GH100</td><td class="star">GH100 (same)</td><td>GB200</td><td class="new">R200</td></tr>
+<tr><td>Transistors</td><td>80B</td><td>80B</td><td class="star">208B</td><td class="new">336B</td></tr>
+<tr><td>Process</td><td>TSMC 4nm</td><td>TSMC 4nm</td><td>TSMC 4NP</td><td class="new">TSMC 3nm</td></tr>
+<tr><td>Memory</td><td>80GB HBM3</td><td class="star">141GB HBM3e</td><td>192GB HBM3e</td><td class="new">288GB HBM4</td></tr>
+<tr><td>Memory BW</td><td>3.35 TB/s</td><td class="star">4.8 TB/s</td><td>8 TB/s</td><td class="new">22 TB/s</td></tr>
+<tr><td>Tensor Gen</td><td>4th (FP8)</td><td>4th (FP8)</td><td class="star">5th (FP4)</td><td class="new">6th (FP4)</td></tr>
+<tr><td>FP8 Inference</td><td>3,958 TFLOPS</td><td>3,958 TFLOPS</td><td class="star">~9,000 TFLOPS</td><td class="new">50 PFLOPS (FP4)</td></tr>
+<tr><td>NVLink</td><td>Gen4 900GB/s</td><td>Gen4 900GB/s</td><td class="star">Gen5 1.8 TB/s</td><td class="new">Gen6 3.6 TB/s</td></tr>
+<tr><td>TDP</td><td>700W</td><td>700W</td><td>1,000-1,200W</td><td class="new">1,800-2,300W</td></tr>
+<tr><td>Cooling</td><td>Liquid or air</td><td>Liquid or air</td><td>Liquid preferred</td><td class="new">100% liquid required</td></tr>
+</tbody>
+</table></div>
+
+<div class="concept visible highlight">
+<div class="concept-label">Blackwell B200 — Key Innovations (2024)</div>
+<div class="concept-title">Named After David Harold Blackwell, Statistician</div>
+<div class="code"><span class="g">Blackwell B200 — What Is New vs Hopper:</span>
+<span class="w">├── </span><span class="y">Dual-die chiplet design</span><span class="w"> — two dies on one package</span>
+<span class="w">│   connected by 10 TB/s NV-HBI chip-to-chip link</span>
+<span class="w">│   bypasses 800mm2 reticle limit → enables 208B transistors</span>
+<span class="w">├── </span><span class="y">5th gen Tensor Cores</span><span class="w"> — native FP4 precision (first ever)</span>
+<span class="w">├── </span><span class="y">2nd gen Transformer Engine</span><span class="w"> — better mixed-precision</span>
+<span class="w">├── </span><span class="y">NVLink Gen 5</span><span class="w"> — 1.8 TB/s (double Hopper)</span>
+<span class="w">├── HBM3e — 192GB at 8 TB/s (double H100)</span>
+<span class="w">└── </span><span class="g">Approx 4x H100 inference throughput</span>
+<span class="w">    2.5x training throughput vs H100</span>
+<span class="w">    30x better LLM inference at cluster level vs H100</span></div>
+</div>
+
+<div class="concept visible highlight">
+<div class="concept-label">Vera Rubin R200 — In Production 2026</div>
+<div class="concept-title">Named After Vera Rubin, Astronomer Who Discovered Dark Matter</div>
+<div class="code"><span class="g">Rubin R200 — Announced CES 2026, shipping H2 2026:</span>
+<span class="w">├── </span><span class="y">336 billion transistors</span><span class="w"> (1.6x Blackwell)</span>
+<span class="w">├── TSMC 3nm process (full node shrink from Blackwell 4nm)</span>
+<span class="w">├── </span><span class="y">Dual-die design</span><span class="w"> — two reticle-sized compute dies</span>
+<span class="w">├── </span><span class="y">HBM4 memory</span><span class="w"> — 288GB at </span><span class="g">22 TB/s</span><span class="w"> (2.8x Blackwell)</span>
+<span class="w">├── </span><span class="y">6th gen Tensor Cores</span><span class="w"> — 50 PFLOPS FP4 per chip</span>
+<span class="w">├── 224 Streaming Multiprocessors per GPU</span>
+<span class="w">├── NVLink 6 — 3.6 TB/s per GPU (double Blackwell)</span>
+<span class="w">├── TDP: 1,800-2,300W</span>
+<span class="w">└── </span><span class="r">100% liquid cooling required — no air-cooled SKU</span>
+
+<span class="g">Vera Rubin NVL72 Rack (72 GPUs + 36 Vera CPUs):</span>
+<span class="w">├── 3.6 EFLOPS FP4 inference (5x Blackwell NVL72)</span>
+<span class="w">├── 20.7 TB total HBM4 memory</span>
+<span class="w">├── 260 TB/s NVLink 6 bandwidth</span>
+<span class="w">├── 54 TB LPDDR5X system memory (Vera CPUs)</span>
+<span class="w">├── Weight: 1.36 tons (3,000 pounds)</span>
+<span class="w">└── Peak power: 120.8 kW</span></div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">Complete Architecture Timeline — 1993 to 2027</div>
+<div class="concept-title">All Named After Scientists</div>
+<div class="code"><span class="w">2010  </span><span class="y">Fermi</span><span class="w">       Enrico Fermi      — First HPC GPU, 40nm</span>
+<span class="w">2012  </span><span class="y">Kepler</span><span class="w">      Johannes Kepler   — Powered AlexNet, 28nm</span>
+<span class="w">2014  </span><span class="y">Maxwell</span><span class="w">     James Maxwell     — Power efficiency king, 28nm</span>
+<span class="w">2016  </span><span class="y">Pascal</span><span class="w">      Blaise Pascal     — NVLink, HBM2, P100 naming, 16nm</span>
+<span class="w">2017  </span><span class="g">Volta</span><span class="w">       Alessandro Volta  — FIRST Tensor Cores, 12nm</span>
+<span class="w">2018  </span><span class="y">Turing</span><span class="w">      Alan Turing       — RTX ray tracing, INT8, 12nm</span>
+<span class="w">2020  </span><span class="g">Ampere</span><span class="w">      Andre-Marie Ampere — A100, BF16, MIG, 7nm</span>
+<span class="w">2022  </span><span class="g">Hopper</span><span class="w">      Grace Hopper      — H100, FP8, Transformer Engine, 4nm</span>
+<span class="w">2024  </span><span class="g">Blackwell</span><span class="w">   David Blackwell   — B200, FP4, dual-die chiplet, 4NP</span>
+<span class="w">2026  </span><span class="g">Rubin</span><span class="w">       Vera Rubin        — R200, HBM4, 3nm, in production now</span>
+<span class="w">2027  </span><span class="o">Rubin Ultra</span><span class="w"> Vera Rubin        — NVL576, HBM4e, planned</span></div>
+</div>
+
+<div class="concept visible">
+<div class="concept-label">Memory Bandwidth Evolution — The Primary AI Bottleneck</div>
+<div class="concept-title">30x Improvement in 10 Years</div>
+<div class="code"><span class="w">Pascal   P100:  </span><span class="o">  720 GB/s</span><span class="w">  HBM2</span>
+<span class="w">Volta    V100:  </span><span class="o">  900 GB/s</span><span class="w">  HBM2</span>
+<span class="w">Ampere   A100: </span><span class="y">2,039 GB/s</span><span class="w">  HBM2e</span>
+<span class="w">Hopper   H100: </span><span class="y">3,350 GB/s</span><span class="w">  HBM3</span>
+<span class="g">Hopper   H200: 4,800 GB/s  HBM3e  ← YOUR GPU AT UT SYSTEM</span>
+<span class="w">Blackwell B200: 8,000 GB/s</span><span class="w">  HBM3e</span>
+<span class="w">Rubin    R200: </span><span class="g">22,000 GB/s</span><span class="w">  HBM4   ← 2026, in production</span>
+
+<span class="b">Memory bandwidth is now the primary bottleneck for LLM inference</span>
+<span class="b">More parameters = more memory reads = bandwidth wins over raw compute</span></div>
+</div>
+</div>
+</section>
+<hr>
+
+<section id="flashcards">
+<div class="page">
+<div class="sec-header">
+<div class="sec-num">Key Concepts</div>
+<div class="sec-title">Quick <span>Flashcards</span></div>
+<div class="sec-desc">Click any card to reveal the answer. Practise until responses are instant.</div>
+</div>
+
+<div class="flashcard" onclick="flip(this)">
+<div class="flashcard-q">What is a Warp and why does it matter for CUDA programming?</div>
+<div class="flashcard-hint">Click to reveal answer</div>
+<div class="flashcard-a">A <strong>Warp = exactly 32 threads</strong> that execute the same instruction simultaneously on different data (SIMT). All 32 threads are scheduled by the Warp Scheduler and dispatched in one clock cycle. <strong>Warp Divergence</strong> — when threads within a warp take different code paths (if/else branching) — forces serialisation and kills parallelism. Avoiding warp divergence is one of the most critical CUDA optimisation rules.</div>
+</div>
+
+<div class="flashcard" onclick="flip(this)">
+<div class="flashcard-q">When were Tensor Cores introduced and what do they do?</div>
+<div class="flashcard-hint">Click to reveal answer</div>
+<div class="flashcard-a"><strong>Volta architecture, 2017.</strong> Tensor Cores are specialised units for matrix multiplication — the fundamental operation of all neural networks. They delivered an <strong>8x-12x performance increase</strong> for AI vs Pascal. Each generation improved: Volta (FP16), Turing (INT8/4), Ampere (BF16, TF32, sparsity), Hopper (FP8, Transformer Engine), Blackwell (FP4), Rubin (6th gen). Always compare Tensor Core generations by TFLOPS not count.</div>
+</div>
+
+<div class="flashcard" onclick="flip(this)">
+<div class="flashcard-q">What is the difference between H100 and H200? What chip do they share?</div>
+<div class="flashcard-hint">Click to reveal answer</div>
+<div class="flashcard-a">Both use the <strong>same GH100 chip</strong> (Hopper architecture, CC 9.0). The H200 upgrade is entirely in the memory subsystem: <strong>141GB HBM3e at 4.8 TB/s</strong> versus H100s 80GB HBM3 at 3.35 TB/s. 1.76x more memory, 1.43x more bandwidth. Same compute performance, significantly better for large model inference where memory is the bottleneck. Both require minimum CUDA 11.8.</div>
+</div>
+
+<div class="flashcard" onclick="flip(this)">
+<div class="flashcard-q">Why does Ampere have fewer Tensor Cores (432) than Volta (640)?</div>
+<div class="flashcard-hint">Click to reveal answer</div>
+<div class="flashcard-a">Because each <strong>3rd gen Ampere Tensor Core is approximately 2.5x more capable</strong> than each 2nd gen Volta Tensor Core. Ampere Tensor Cores support more data types (BF16, TF32) and deliver higher throughput per core. Result: 432 Ampere Tensor Cores = 312 TFLOPS versus 640 Volta Tensor Cores = 125 TFLOPS. Always compare TFLOPS not raw counts.</div>
+</div>
+
+<div class="flashcard" onclick="flip(this)">
+<div class="flashcard-q">What is the naming convention for NVIDIA GPU chips?</div>
+<div class="flashcard-hint">Click to reveal answer</div>
+<div class="flashcard-a"><strong>G + Architecture initial letter + number.</strong> Examples: GF100 (Fermi), GK110 (Kepler), GM200 (Maxwell), GP100 (Pascal), GV100 (Volta), GA100 (Ampere), GH100 (Hopper), GB200 (Blackwell), R200 (Rubin). From Pascal onwards, HPC GPUs use the pattern architecture-letter-100: P100, V100, A100, H100. Lower chip number within a family = higher tier (GA100 > GA106).</div>
+</div>
+
+<div class="flashcard" onclick="flip(this)">
+<div class="flashcard-q">What are the 4 key parameters for evaluating GPU performance?</div>
+<div class="flashcard-hint">Click to reveal answer</div>
+<div class="flashcard-a"><strong>1. Memory Bandwidth</strong> (GB/s or TB/s — bus width x memory speed x technology type). <strong>2. Instructions Throughput</strong> (TFLOPS — core count x clock speed, captures both in one number). <strong>3. Energy Consumption</strong> (TDP in watts — critical at data center scale). <strong>4. New Hardware Units</strong> (Tensor Cores, Transformer Engine — biggest leaps come from new units not more cores). Never judge by core count alone.</div>
+</div>
+
+<div class="flashcard" onclick="flip(this)">
+<div class="flashcard-q">What does Compute Capability 9.0 (H200) unlock and require?</div>
+<div class="flashcard-hint">Click to reveal answer</div>
+<div class="flashcard-a">CC 9.0 (Hopper — H100 and H200) requires <strong>minimum CUDA 11.8</strong>. Unlocks: FP8 precision, 4th gen Tensor Cores with Transformer Engine, NVLink 4.0 at 900 GB/s, BF16, TF32, FP16, INT8 support. Running CUDA below 11.8 causes incompatibility errors. Quick check: nvidia-smi --query-gpu=compute_cap --format=csv</div>
+</div>
+
+<div class="flashcard" onclick="flip(this)">
+<div class="flashcard-q">What are the headline specs of the Vera Rubin R200?</div>
+<div class="flashcard-hint">Click to reveal answer</div>
+<div class="flashcard-a">NVIDIA Vera Rubin R200 (2026, in production): <strong>336 billion transistors</strong> on TSMC 3nm, dual-die design, <strong>288GB HBM4 at 22 TB/s</strong> (2.8x Blackwell), <strong>50 PFLOPS FP4</strong> per chip, NVLink 6 at 3.6 TB/s, 224 SMs, 1,800-2,300W TDP with 100% liquid cooling required. The NVL72 rack delivers 3.6 EFLOPS inference with 72 Rubin GPUs and 36 Vera CPUs — 5x faster than Blackwell NVL72.</div>
+</div>
+
+<div class="flashcard" onclick="flip(this)">
+<div class="flashcard-q">Why do data center GPUs have no cooling fan?</div>
+<div class="flashcard-hint">Click to reveal answer</div>
+<div class="flashcard-a">Data center GPUs in the Tesla generation (A100, H100, H200, B200) are installed in server chassis that provide managed external airflow or liquid cooling systems. An onboard fan would be redundant, adds cost, and creates reliability concerns at scale. Consumer GPUs need onboard fans because desktops and workstations do not provide managed airflow. The presence or absence of a fan is the fastest visual way to identify HPC versus consumer GPUs.</div>
+</div>
+
+<div class="flashcard" onclick="flip(this)">
+<div class="flashcard-q">Why is CUDA NVIDIA's biggest competitive moat?</div>
+<div class="flashcard-hint">Click to reveal answer</div>
+<div class="flashcard-a">CUDA launched in <strong>2006</strong> — opening NVIDIA GPUs to general-purpose parallel computing. Every major AI framework (PyTorch, TensorFlow, JAX), every HPC toolkit, and every AI researcher has been building on CUDA for 18+ years. Switching away requires rewriting enormous software ecosystems. This creates deep ecosystem lock-in that is harder to overcome than any hardware advantage. NVIDIA's deepest competitive moat is not the hardware — it is the CUDA software ecosystem built on top of it.</div>
+</div>
+
+<div class="flashcard" onclick="flip(this)">
+<div class="flashcard-q">What is the key innovation of Blackwell vs Hopper in hardware design?</div>
+<div class="flashcard-hint">Click to reveal answer</div>
+<div class="flashcard-a"><strong>Dual-die chiplet design</strong> — two reticle-sized GPU dies connected by a 10 TB/s NV-HBI (NVLink High-Bandwidth Interface) chip-to-chip interconnect. This bypasses the approximately 800mm2 reticle size limit of TSMC's process, enabling 208 billion transistors on one package versus Hopper's 80 billion. The two dies appear as a single logical GPU to software. Plus: 5th gen Tensor Cores with native FP4, 2nd gen Transformer Engine, NVLink 5 at 1.8 TB/s, and approximately 4x H100 inference throughput.</div>
+</div>
+
+<div class="flashcard" onclick="flip(this)">
+<div class="flashcard-q">NVIDIA revenue milestones — $1T to $5T. When?</div>
+<div class="flashcard-hint">Click to reveal answer</div>
+<div class="flashcard-a"><strong>$1 trillion</strong> — June 2023. <strong>$2 trillion</strong> — February 2024. <strong>$3 trillion</strong> — June 2024. <strong>$4 trillion</strong> — July 2025. <strong>$5 trillion</strong> — October 2025 (first company ever). FY2026 revenue: $215.9 billion (+65% YoY). Q1 FY2027: $81.6 billion (+85% YoY). Jensen Huang projects $1 trillion in chip orders for Blackwell and Rubin through 2027.</div>
+</div>
+</div>
+</section>
+
+<footer class="footer">
+<div class="footer-title">GPU Study Guide — Ranjit Kumar Rudra</div>
+<div class="footer-sub">GPU Architecture & AI Computing Reference · ranjitrudra.github.io · May 2026</div>
+</footer>
+
+<div class="progress-wrap">
+<span style="font-size:10px;letter-spacing:1px;">SCROLL</span>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+</div>
+
+<script>
+window.addEventListener('scroll',()=>{
+  const s=document.documentElement;
+  const pct=(s.scrollTop/(s.scrollHeight-s.clientHeight))*100;
+  document.getElementById('progressFill').style.width=pct+'%';
+});
+
+function jumpTo(id){
+  const el=document.getElementById(id);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+const obs=new IntersectionObserver((entries)=>{
+  entries.forEach((e,i)=>{
+    if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*60);}
+  });
+},{threshold:0.1});
+document.querySelectorAll('.concept').forEach(el=>obs.observe(el));
+
+function flip(el){
+  const ans=el.querySelector('.flashcard-a');
+  ans.classList.toggle('show');
+  const hint=el.querySelector('.flashcard-hint');
+  hint.textContent=ans.classList.contains('show')?'Click to hide':'Click to reveal answer';
+}
+
+function doSearch(){
+  const q=document.getElementById('searchBox').value.toLowerCase().trim();
+  const countEl=document.getElementById('searchCount');
+  if(!q){countEl.textContent='';return;}
+  const sections=document.querySelectorAll('section');
+  let found=0;
+  sections.forEach(sec=>{
+    if(sec.textContent.toLowerCase().includes(q))found++;
+  });
+  countEl.textContent=found>0?found+' sections match':'No matches found';
+}
+</script>
+</body>
+</html>
