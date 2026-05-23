@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVIDIA — The Complete Story</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --green: #76b900;
+    --green-dim: #4a7500;
+    --black: #0a0a0a;
+    --card: #111111;
+    --card2: #161616;
+    --border: #222222;
+    --text: #e8e8e8;
+    --muted: #888888;
+    --accent: #9dda00;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    padding: 60px 20px;
+    background: radial-gradient(ellipse at 50% 40%, #1a2e00 0%, #0a0a0a 70%);
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 40px,
+      rgba(118,185,0,0.03) 40px,
+      rgba(118,185,0,0.03) 41px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 40px,
+      rgba(118,185,0,0.03) 40px,
+      rgba(118,185,0,0.03) 41px
+    );
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--green);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 15vw, 160px);
+    line-height: 0.9;
+    color: var(--green);
+    letter-spacing: 2px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+    text-shadow: 0 0 80px rgba(118,185,0,0.3);
+  }
+
+  .hero-subtitle {
+    font-size: clamp(14px, 2vw, 18px);
+    color: var(--muted);
+    margin-top: 24px;
+    max-width: 600px;
+    font-weight: 300;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 60px;
+    margin-top: 60px;
+    flex-wrap: wrap;
+    justify-content: center;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 42px;
+    color: var(--green);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+
+  /* NAV */
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav::-webkit-scrollbar { display: none; }
+
+  .nav-btn {
+    padding: 14px 20px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .nav-btn:hover, .nav-btn.active {
+    color: var(--green);
+    border-bottom-color: var(--green);
+  }
+
+  /* SECTIONS */
+  .section {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 80px 24px;
+  }
+
+  .section-header {
+    margin-bottom: 60px;
+  }
+
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--green);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 6vw, 64px);
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .section-title span { color: var(--green); }
+
+  .section-desc {
+    margin-top: 16px;
+    color: var(--muted);
+    max-width: 600px;
+    font-weight: 300;
+  }
+
+  /* TIMELINE */
+  .timeline { position: relative; }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--green), transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-left: 60px;
+    margin-bottom: 48px;
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.5s;
+  }
+
+  .timeline-item.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .timeline-dot {
+    position: absolute;
+    left: 12px;
+    top: 6px;
+    width: 17px;
+    height: 17px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 16px rgba(118,185,0,0.5);
+  }
+
+  .timeline-dot.major {
+    width: 21px;
+    height: 21px;
+    left: 10px;
+    box-shadow: 0 0 24px rgba(118,185,0,0.8);
+  }
+
+  .timeline-year {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--green);
+    line-height: 1;
+  }
+
+  .timeline-event {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 4px 0 8px;
+  }
+
+  .timeline-desc {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .timeline-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    background: rgba(118,185,0,0.1);
+    border: 1px solid rgba(118,185,0,0.3);
+    border-radius: 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--green);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  /* CARDS GRID */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px;
+    transition: all 0.3s;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .card:hover {
+    border-color: rgba(118,185,0,0.4);
+    background: var(--card2);
+    transform: translateY(-4px);
+  }
+
+  .card-icon {
+    font-size: 28px;
+    margin-bottom: 16px;
+  }
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .card-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ARCH TABLE */
+  .arch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+
+  .arch-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px 20px;
+    text-align: center;
+    transition: all 0.3s;
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  .arch-card.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .arch-card:hover {
+    border-color: var(--green);
+    transform: scale(1.02);
+  }
+
+  .arch-year-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .arch-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--green);
+    letter-spacing: 1px;
+  }
+
+  .arch-chip {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .arch-spec {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* REVENUE CHART */
+  .revenue-chart {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px;
+    margin-bottom: 32px;
+  }
+
+  .chart-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 180px;
+  }
+
+  .bar-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    justify-content: flex-end;
+  }
+
+  .bar-val {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--green);
+    text-align: center;
+  }
+
+  .bar {
+    width: 100%;
+    background: linear-gradient(to top, var(--green), var(--accent));
+    border-radius: 3px 3px 0 0;
+    transition: height 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 0;
+  }
+
+  .bar-yr {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 6px;
+  }
+
+  /* FOUNDER */
+  .founder-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 40px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 32px;
+    align-items: start;
+    margin-bottom: 24px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s;
+  }
+
+  .founder-block.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .founder-avatar {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, var(--green), var(--green-dim));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--black);
+    flex-shrink: 0;
+  }
+
+  .founder-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .founder-role {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--green);
+    text-transform: uppercase;
+    margin: 4px 0 12px;
+  }
+
+  .founder-bio {
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  /* DIVIDER */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 0;
+  }
+
+  /* BIG QUOTE */
+  .big-quote {
+    background: linear-gradient(135deg, rgba(118,185,0,0.08), rgba(118,185,0,0.02));
+    border-left: 3px solid var(--green);
+    padding: 32px;
+    border-radius: 0 8px 8px 0;
+    margin: 40px 0;
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-style: italic;
+    color: var(--text);
+    font-weight: 300;
+  }
+
+  .big-quote cite {
+    display: block;
+    margin-top: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    font-style: normal;
+    letter-spacing: 1px;
+  }
+
+  /* PRODUCT TABLE */
+  .product-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .product-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .product-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--muted);
+    vertical-align: top;
+  }
+
+  .product-table td:first-child { color: var(--text); font-weight: 500; }
+  .product-table tr:hover td { background: rgba(118,185,0,0.03); }
+
+  /* FOOTER */
+  .footer {
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 40px 24px;
+    text-align: center;
+  }
+
+  .footer-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--green);
+    margin-bottom: 8px;
+  }
+
+  .footer-text {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--black); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  @media (max-width: 600px) {
+    .hero-stats { gap: 30px; }
+    .founder-block { grid-template-columns: 1fr; }
+    .bars { gap: 4px; }
+    .bar-val { font-size: 7px; }
+    .bar-yr { font-size: 7px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Founded 1993 · The Complete Story</div>
+  <div class="hero-title">NVIDIA</div>
+  <div class="hero-subtitle">From a Denny's booth to the world's most valuable company — how three engineers changed computing forever.</div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">$5T+</div>
+      <div class="stat-label">Peak Market Cap</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">32+</div>
+      <div class="stat-label">Years of Jensen</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">$216B</div>
+      <div class="stat-label">FY2026 Revenue</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">90%+</div>
+      <div class="stat-label">AI GPU Market Share</div>
+    </div>
+  </div>
+  <div class="scroll-hint">↓ scroll to explore</div>
+</section>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="scrollTo('founding')">Founding</button>
+  <button class="nav-btn" onclick="scrollTo('founders')">Founders</button>
+  <button class="nav-btn" onclick="scrollTo('timeline')">Timeline</button>
+  <button class="nav-btn" onclick="scrollTo('products')">Products</button>
+  <button class="nav-btn" onclick="scrollTo('architectures')">GPU Architectures</button>
+  <button class="nav-btn" onclick="scrollTo('revenue')">Revenue Growth</button>
+  <button class="nav-btn" onclick="scrollTo('today')">Today & Future</button>
+</nav>
+
+<!-- FOUNDING -->
+<section class="section" id="founding">
+  <div class="section-header">
+    <div class="section-tag">Chapter 01</div>
+    <div class="section-title">The <span>Denny's</span> Bet</div>
+    <div class="section-desc">How a meeting over eggs and coffee gave birth to the company that would power the AI revolution.</div>
+  </div>
+
+  <div class="big-quote">
+    "We also observed that video games were simultaneously one of the most computationally challenging problems and the largest market opportunity in computing."
+    <cite>— Jensen Huang, on why NVIDIA was founded</cite>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">📅</div>
+      <div class="card-title">April 5, 1993</div>
+      <div class="card-desc">NVIDIA is officially incorporated. The name comes from "invidia" — Latin for envy — and from the internal file prefix "NV" used by the founders, standing for "next version."</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🍳</div>
+      <div class="card-title">The Denny's Meeting</div>
+      <div class="card-desc">In late 1992, Jensen Huang, Chris Malachowsky, and Curtis Priem met at a Denny's on Berryessa Road in East San Jose. They agreed to start a company around one big idea: dedicated graphics chips would unlock computing challenges CPUs couldn't solve.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">💰</div>
+      <div class="card-title">$40,000 Seed</div>
+      <div class="card-desc">The trio pooled personal savings of around $40,000 to start. Within the first year they secured ~$20 million in venture capital from Sequoia Capital and Sutter Hill Ventures — one of the best VC bets in history.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏭</div>
+      <div class="card-title">Fabless from Day One</div>
+      <div class="card-desc">NVIDIA was founded as a fabless semiconductor company — it designs chips but outsources manufacturing to foundries like TSMC. This model allowed rapid innovation without the capital costs of building fabs.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <div class="card-title">The Core Vision</div>
+      <div class="card-desc">The founders identified that CPUs were terrible at parallel tasks like 3D graphics. Specialized parallel processors — GPUs — would be orders of magnitude better. This insight would eventually power all of modern AI.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌍</div>
+      <div class="card-title">The Market in 1993</div>
+      <div class="card-desc">When NVIDIA launched, roughly 90 graphics chip companies competed in the same space — S3, ATI, Matrox, Trident, Cirrus Logic. Only one would dominate. The odds were terrible. Jensen bet anyway.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- FOUNDERS -->
+<section class="section" id="founders">
+  <div class="section-header">
+    <div class="section-tag">Chapter 02</div>
+    <div class="section-title">The <span>Founders</span></div>
+    <div class="section-desc">Three engineers from three companies with one shared vision.</div>
+  </div>
+
+  <div class="founder-block">
+    <div class="founder-avatar">JH</div>
+    <div>
+      <div class="founder-name">Jensen Huang</div>
+      <div class="founder-role">Co-founder, President & CEO — 1993 to Present</div>
+      <div class="founder-bio">Taiwanese-American electrical engineer born in Tainan, Taiwan. Came to the US at age 9. Worked as a dishwasher at Denny's as a teenager in Portland — the same chain where NVIDIA was conceptualized. Studied at Oregon State University and Stanford (MS EE). Previously Director of CoreWare at LSI Logic and microprocessor designer at AMD. Has led NVIDIA as CEO for over 32 years — one of the longest-tenured CEOs in Silicon Valley history. Known for his leather jacket, direct style, and singular long-term vision. Called "the most important person in tech" by many analysts during the AI boom.</div>
+    </div>
+  </div>
+
+  <div class="founder-block">
+    <div class="founder-avatar">CM</div>
+    <div>
+      <div class="founder-name">Chris Malachowsky</div>
+      <div class="founder-role">Co-founder, Engineer</div>
+      <div class="founder-bio">Previously an engineer at Sun Microsystems where he was frustrated with management direction. He and Curtis Priem were actively looking to leave Sun when Jensen Huang convinced them to start something new. Malachowsky brought deep hardware engineering expertise and Sun's system-level thinking to NVIDIA's early chip designs.</div>
+    </div>
+  </div>
+
+  <div class="founder-block">
+    <div class="founder-avatar">CP</div>
+    <div>
+      <div class="founder-name">Curtis Priem</div>
+      <div class="founder-role">Co-founder, Chief Technologist</div>
+      <div class="founder-bio">Senior staff engineer and graphics chip designer at both IBM and Sun Microsystems. Priem was the deepest graphics architecture expert of the three and contributed the foundational chip design philosophy. He later donated $50 million to Rensselaer Polytechnic Institute (RPI) and eventually transitioned away from day-to-day operations as NVIDIA scaled.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- TIMELINE -->
+<section class="section" id="timeline">
+  <div class="section-header">
+    <div class="section-tag">Chapter 03</div>
+    <div class="section-title">The <span>Timeline</span></div>
+    <div class="section-desc">Every major milestone from 1993 to 2026.</div>
+  </div>
+
+  <div class="timeline">
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1993</div>
+      <div class="timeline-event">NVIDIA Founded</div>
+      <div class="timeline-desc">April 5 — Jensen Huang, Chris Malachowsky, and Curtis Priem incorporate NVIDIA in Santa Clara, CA. First partner: SGS-Thomson (now STMicroelectronics).</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1995</div>
+      <div class="timeline-event">NV1 — First Product (Commercial Failure)</div>
+      <div class="timeline-desc">NVIDIA's first GPU, the NV1, launches — a multi-function PCI card combining 2D/3D graphics, audio, and game ports. Its quadratic texture mapping approach conflicts with Microsoft's DirectX triangle-based standard. NVIDIA nearly goes bankrupt. Jensen later calls this period "the two worst years of my professional life."</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">1997</div>
+      <div class="timeline-event">RIVA 128 — The Comeback</div>
+      <div class="timeline-desc">NVIDIA pivots hard to DirectX compliance and releases the RIVA 128 — a 128-bit 3D processor that sells over 1 million units in its first four months. The company survives and gains real momentum. Partnerships with Dell, Gateway, and Micron follow.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot major"></div>
+      <div class="timeline-badge">🚀 MAJOR MILESTONE</div>
+      <div class="timeline-year">1999</div>
+      <div class="timeline-event">GeForce 256 — The GPU is Born + IPO</div>
+      <div class="timeline-desc">NVIDIA coins the term "GPU" and launches the GeForce 256 — the world's first chip to perform hardware transform and lighting, offloading this from the CPU for the first time. NVIDIA goes public on NASDAQ at $12/share on January 22. This redefines PC architecture and launches the modern gaming industry.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2000</div>
+      <div class="timeline-event">3dfx Acquisition</div>
+      <div class="timeline-desc">NVIDIA acquires the assets of 3dfx Interactive — its biggest gaming rival and maker of the famous Voodoo cards — for $70 million. This removes NVIDIA's main competitor and consolidates the discrete GPU market.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2001</div>
+      <div class="timeline-event">Xbox Graphics Deal</div>
+      <div class="timeline-desc">NVIDIA wins the contract to provide graphics for Microsoft's original Xbox game console — a major validation of the GeForce architecture and a huge revenue driver.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2003</div>
+      <div class="timeline-event">Quadro & Tesla — Professional & Compute</div>
+      <div class="timeline-desc">NVIDIA expands beyond gaming into professional visualization (Quadro line for CAD/design workstations) and begins early work on GPU computing for scientific applications. Revenue approaches $1B.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot major"></div>
+      <div class="timeline-badge">🔑 DEFINING MOMENT</div>
+      <div class="timeline-year">2006</div>
+      <div class="timeline-event">CUDA Launched — The Bet That Changed Everything</div>
+      <div class="timeline-desc">NVIDIA launches CUDA (Compute Unified Device Architecture) — a parallel computing platform that opens GPUs to general-purpose computation beyond graphics. Scientists, researchers, and eventually AI developers can now write code that runs on NVIDIA GPUs. This single decision seeds the entire AI revolution. At the time, investors were skeptical. Jensen was not.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2008</div>
+      <div class="timeline-event">Tesla GPU Computing Line</div>
+      <div class="timeline-desc">NVIDIA launches the Tesla product line — GPUs purpose-built for HPC and scientific computing. These become the foundation for data center GPU computing. Revenue hits $3.5B.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2011</div>
+      <div class="timeline-event">Tegra Mobile & Automotive</div>
+      <div class="timeline-desc">NVIDIA introduces its Tegra line of mobile/embedded processors. The company begins exploring automotive computing — a strategic move that would eventually lead to the DRIVE platform for autonomous vehicles.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot major"></div>
+      <div class="timeline-badge">⚡ AI IGNITION</div>
+      <div class="timeline-year">2012</div>
+      <div class="timeline-event">AlexNet Changes History</div>
+      <div class="timeline-desc">AlexNet, a deep neural network trained on two NVIDIA GTX 580 GPUs by researchers at University of Toronto, wins the ImageNet competition by a massive margin over CPU-based approaches. This moment — dubbed "First Contact" — proves that GPUs + deep learning = the future of AI. Every major AI lab immediately begins buying NVIDIA GPUs.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2016</div>
+      <div class="timeline-event">Pascal Architecture + DGX-1 Supercomputer</div>
+      <div class="timeline-desc">NVIDIA launches the Pascal architecture (P100) and the DGX-1 — the world's first AI supercomputer in a box. Jensen personally delivers the first DGX-1 to OpenAI. Revenue reaches $6.9B. The data center business begins its ascent.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2017</div>
+      <div class="timeline-event">Volta + Toyota Partnership</div>
+      <div class="timeline-desc">Volta architecture launches with Tensor Cores — specialized hardware for AI matrix math that delivers massive deep learning speedups. Toyota partners with NVIDIA for autonomous vehicle AI using the Drive PX platform. NVIDIA reaches $9.7B revenue.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2018</div>
+      <div class="timeline-event">RTX & Real-Time Ray Tracing</div>
+      <div class="timeline-desc">NVIDIA launches the Turing architecture with RTX — the first GPU capable of real-time ray tracing, a fundamental shift in how light and shadow are rendered in games and professional visualization. The RTX brand becomes synonymous with premium graphics.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot major"></div>
+      <div class="timeline-badge">🏆 BIG ACQUISITION</div>
+      <div class="timeline-year">2019–2020</div>
+      <div class="timeline-event">Mellanox Acquisition — $6.9 Billion</div>
+      <div class="timeline-desc">NVIDIA acquires Mellanox Technologies — the leading maker of InfiniBand and high-speed networking interconnects used in data centers and HPC clusters — for $6.9B. This gives NVIDIA end-to-end control of the AI data center stack: GPUs + networking. The Mellanox team is the backbone of today's NVLink and NVSwitch technologies.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2020</div>
+      <div class="timeline-event">Ampere Architecture</div>
+      <div class="timeline-desc">The A100 GPU launches — purpose-built for AI. It becomes the workhorse of data center AI for three years. NVIDIA attempts to acquire Arm Holdings for $40B — the deal is ultimately blocked by regulators in 2022 on antitrust grounds. Revenue: $16.7B.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-year">2022</div>
+      <div class="timeline-event">Hopper Architecture — The H100</div>
+      <div class="timeline-desc">The H100 GPU launches, featuring fourth-generation Tensor Cores and the Transformer Engine — purpose-built for the large language model era. This is the GPU that trains ChatGPT, Claude, Gemini, and every major AI model. Demand immediately outstrips supply.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot major"></div>
+      <div class="timeline-badge">💎 $1 TRILLION</div>
+      <div class="timeline-year">2023</div>
+      <div class="timeline-event">NVIDIA Crosses $1 Trillion Valuation</div>
+      <div class="timeline-desc">June 2023 — NVIDIA becomes only the fifth US company to reach a $1 trillion market cap, joining Apple, Microsoft, Alphabet, and Amazon. Q2 revenue guidance of $11B shocks Wall Street (consensus was $7B). The AI boom is now undeniable. Revenue for the full year: $44B.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot major"></div>
+      <div class="timeline-badge">🚀 BLACKWELL ERA</div>
+      <div class="timeline-year">2024</div>
+      <div class="timeline-event">Blackwell Architecture + $2T → $3T → $4T</div>
+      <div class="timeline-desc">NVIDIA crosses $2T in February, $3T in June, and $4T in October. The Blackwell architecture launches — 208 billion transistors, 30x faster than Hopper for AI inference. Jensen Huang announces Vera Rubin as the next generation. Revenue: $130.5B. NVIDIA is now the most valuable company in the world for stretches of time.</div>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-dot major"></div>
+      <div class="timeline-badge">🌟 TODAY</div>
+      <div class="timeline-year">2025–2026</div>
+      <div class="timeline-event">$5 Trillion + Vera Rubin + $216B Revenue</div>
+      <div class="timeline-desc">NVIDIA becomes the world's first $5 trillion company in October 2025. Full-year FY2026 revenue hits $216B — up 65% year-over-year. Data center revenue reaches $197B. Q1 FY2027 revenue: $81.6B (85% YoY growth). Vera Rubin architecture enters production — 3.5x faster than Blackwell. Jensen projects $1 trillion in chip orders through 2027.</div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- PRODUCTS -->
+<section class="section" id="products">
+  <div class="section-header">
+    <div class="section-tag">Chapter 04</div>
+    <div class="section-title">Product <span>Lines</span></div>
+    <div class="section-desc">NVIDIA's portfolio spans gaming, professional visualization, data center AI, automotive, and robotics.</div>
+  </div>
+
+  <table class="product-table">
+    <thead>
+      <tr>
+        <th>Product Line</th>
+        <th>Target Market</th>
+        <th>Key Products</th>
+        <th>What It Does</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>GeForce</td>
+        <td>Gaming & Consumers</td>
+        <td>RTX 4090, RTX 5090</td>
+        <td>Desktop and laptop GPUs for gaming, content creation, and personal AI</td>
+      </tr>
+      <tr>
+        <td>Quadro / RTX Pro</td>
+        <td>Professional Visualization</td>
+        <td>RTX 6000 Ada</td>
+        <td>Workstation GPUs for CAD, VFX, architecture, medical imaging</td>
+      </tr>
+      <tr>
+        <td>Tesla / Data Center</td>
+        <td>HPC & AI Data Centers</td>
+        <td>H100, H200, B200, B300</td>
+        <td>High-performance GPU compute for AI training and inference at scale</td>
+      </tr>
+      <tr>
+        <td>DGX Systems</td>
+        <td>Enterprise AI</td>
+        <td>DGX H100, DGX H200, DGX SuperPOD</td>
+        <td>Integrated AI supercomputers — like the one you operate at UT System</td>
+      </tr>
+      <tr>
+        <td>NVLink / NVSwitch</td>
+        <td>Multi-GPU Connectivity</td>
+        <td>NVLink 4.0, NVSwitch</td>
+        <td>High-bandwidth chip-to-chip interconnect allowing multiple GPUs to act as one</td>
+      </tr>
+      <tr>
+        <td>InfiniBand / Ethernet</td>
+        <td>Data Center Networking</td>
+        <td>Quantum-2, Spectrum-4</td>
+        <td>High-speed networking fabric for GPU clusters (via Mellanox)</td>
+      </tr>
+      <tr>
+        <td>DRIVE</td>
+        <td>Automotive</td>
+        <td>DRIVE Orin, DRIVE Thor</td>
+        <td>AI computing platform for autonomous vehicles and ADAS</td>
+      </tr>
+      <tr>
+        <td>Jetson</td>
+        <td>Edge AI / Robotics</td>
+        <td>Jetson Orin, Jetson Thor</td>
+        <td>Embedded AI computing for robots, drones, and edge devices</td>
+      </tr>
+      <tr>
+        <td>Omniverse</td>
+        <td>Industrial / Digital Twins</td>
+        <td>Omniverse Enterprise</td>
+        <td>Platform for building physically accurate 3D simulations and digital twins</td>
+      </tr>
+      <tr>
+        <td>Grace CPU</td>
+        <td>Data Center CPUs</td>
+        <td>Grace Hopper Superchip</td>
+        <td>NVIDIA's first CPU — combined with GPU in the Grace Hopper Superchip</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<hr class="divider">
+
+<!-- ARCHITECTURES -->
+<section class="section" id="architectures">
+  <div class="section-header">
+    <div class="section-tag">Chapter 05</div>
+    <div class="section-title">GPU <span>Architectures</span></div>
+    <div class="section-desc">Every major GPU architecture NVIDIA has released — from the first to the latest.</div>
+  </div>
+
+  <div class="arch-grid">
+    <div class="arch-card">
+      <div class="arch-year-tag">1997</div>
+      <div class="arch-name">RIVA 128</div>
+      <div class="arch-chip">NV3</div>
+      <div class="arch-spec">First successful 3D chip</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-year-tag">1999</div>
+      <div class="arch-name">GeForce 256</div>
+      <div class="arch-chip">NV10</div>
+      <div class="arch-spec">First GPU — Hardware T&L</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-year-tag">2006</div>
+      <div class="arch-name">Tesla</div>
+      <div class="arch-chip">G80</div>
+      <div class="arch-spec">First CUDA-capable GPU</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-year-tag">2010</div>
+      <div class="arch-name">Fermi</div>
+      <div class="arch-chip">GF100</div>
+      <div class="arch-spec">First GPU for HPC</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-year-tag">2012</div>
+      <div class="arch-name">Kepler</div>
+      <div class="arch-chip">GK110</div>
+      <div class="arch-spec">Powers AlexNet / Deep Learning</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-year-tag">2014</div>
+      <div class="arch-name">Maxwell</div>
+      <div class="arch-chip">GM204</div>
+      <div class="arch-spec">Power efficiency leap</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-year-tag">2016</div>
+      <div class="arch-name">Pascal</div>
+      <div class="arch-chip">GP100</div>
+      <div class="arch-spec">P100 — First DGX-1</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-year-tag">2017</div>
+      <div class="arch-name">Volta</div>
+      <div class="arch-chip">GV100</div>
+      <div class="arch-spec">First Tensor Cores</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-year-tag">2018</div>
+      <div class="arch-name">Turing</div>
+      <div class="arch-chip">TU102</div>
+      <div class="arch-spec">RTX — Real-time ray tracing</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-year-tag">2020</div>
+      <div class="arch-name">Ampere</div>
+      <div class="arch-chip">GA100</div>
+      <div class="arch-spec">A100 — AI workhorse</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-year-tag">2022</div>
+      <div class="arch-name">Hopper</div>
+      <div class="arch-chip">GH100</div>
+      <div class="arch-spec">H100 — LLM training GPU</div>
+    </div>
+    <div class="arch-card">
+      <div class="arch-year-tag">2024</div>
+      <div class="arch-name">Blackwell</div>
+      <div class="arch-chip">GB200</div>
+      <div class="arch-spec">208B transistors — 30x inference</div>
+    </div>
+    <div class="arch-card" style="border-color: var(--green);">
+      <div class="arch-year-tag">2026 →</div>
+      <div class="arch-name">Rubin</div>
+      <div class="arch-chip">R100</div>
+      <div class="arch-spec">3.5x Blackwell · HBM4 · In production</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- REVENUE -->
+<section class="section" id="revenue">
+  <div class="section-header">
+    <div class="section-tag">Chapter 06</div>
+    <div class="section-title">Revenue <span>Growth</span></div>
+    <div class="section-desc">From $5M in 1994 to $216B in FY2026 — one of the greatest growth stories in business history.</div>
+  </div>
+
+  <div class="revenue-chart">
+    <div class="chart-title">Annual Revenue (USD Billions)</div>
+    <div class="bars" id="bars">
+      <div class="bar-wrap">
+        <div class="bar-val">$0.4B</div>
+        <div class="bar" data-h="0.2" style="background: linear-gradient(to top, #76b900, #9dda00);"></div>
+        <div class="bar-yr">2000</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-val">$1.8B</div>
+        <div class="bar" data-h="0.8"></div>
+        <div class="bar-yr">2004</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-val">$3.5B</div>
+        <div class="bar" data-h="1.6"></div>
+        <div class="bar-yr">2008</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-val">$4.3B</div>
+        <div class="bar" data-h="2.0"></div>
+        <div class="bar-yr">2012</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-val">$6.9B</div>
+        <div class="bar" data-h="3.2"></div>
+        <div class="bar-yr">2016</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-val">$11.7B</div>
+        <div class="bar" data-h="5.4"></div>
+        <div class="bar-yr">2019</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-val">$16.7B</div>
+        <div class="bar" data-h="7.7"></div>
+        <div class="bar-yr">2021</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-val">$27B</div>
+        <div class="bar" data-h="12.5"></div>
+        <div class="bar-yr">2022</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-val">$44B</div>
+        <div class="bar" data-h="20.4"></div>
+        <div class="bar-yr">2023</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-val">$131B</div>
+        <div class="bar" data-h="60.6"></div>
+        <div class="bar-yr">2025</div>
+      </div>
+      <div class="bar-wrap">
+        <div class="bar-val">$216B</div>
+        <div class="bar" data-h="100" style="background: linear-gradient(to top, #76b900, #c8ff00);"></div>
+        <div class="bar-yr">2026</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">📈</div>
+      <div class="card-title">$1T → $5T in 28 Months</div>
+      <div class="card-desc">NVIDIA crossed $1T in June 2023, $2T in Feb 2024, $3T in June 2024, $4T in July 2025, and $5T in October 2025. No company in history has added value that fast.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏦</div>
+      <div class="card-title">Data Center = 92% of Revenue</div>
+      <div class="card-desc">In Q1 FY2027, NVIDIA's data center segment alone generated $75.2B — 92% of total revenue. The gaming business that launched the company now plays second fiddle.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <div class="card-title">$1 Trillion Backlog</div>
+      <div class="card-desc">Jensen Huang projects at least $1 trillion in chip orders for Blackwell and Vera Rubin through 2027 — making it arguably the most visible revenue pipeline of any technology company in history.</div>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<!-- TODAY & FUTURE -->
+<section class="section" id="today">
+  <div class="section-header">
+    <div class="section-tag">Chapter 07</div>
+    <div class="section-title">Today & <span>Future</span></div>
+    <div class="section-desc">Where NVIDIA stands in 2026 and where it's headed next.</div>
+  </div>
+
+  <div class="big-quote">
+    "The buildout of AI factories — the largest infrastructure expansion in human history — is accelerating."
+    <cite>— Jensen Huang, May 2026 Earnings Call</cite>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon">🤖</div>
+      <div class="card-title">Agentic AI Era</div>
+      <div class="card-desc">Reasoning AI models like GPT-5 and Claude 4 consume up to 1,000x more compute than earlier models because they "think" before responding. Jensen says this makes demand "essentially infinite" for GPU compute.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Vera Rubin (2026)</div>
+      <div class="card-desc">3.5x faster than Blackwell on training, 5x faster on inference. 50 petaFLOPs of FP4 per chip. HBM4 memory. The Vera Rubin rack system has 1.3 million components including 72 Rubin GPUs and 36 Vera CPUs. In production now.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌐</div>
+      <div class="card-title">Sovereign AI</div>
+      <div class="card-desc">Governments and countries are building national AI infrastructure — buying NVIDIA systems to power their own AI capabilities. This is a new and rapidly growing market segment Jensen calls "Sovereign AI."</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🚗</div>
+      <div class="card-title">Automotive Explosion</div>
+      <div class="card-desc">NVIDIA's automotive segment grew 32% YoY in FY2026. The DRIVE platform powers hundreds of vehicles from Toyota, Mercedes, BYD, and others. Jensen calls it NVIDIA's "next billion-dollar business."</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🏭</div>
+      <div class="card-title">Physical AI & Robotics</div>
+      <div class="card-desc">Isaac and Omniverse platforms are the foundation for physical AI — robots and automated systems that understand and navigate the physical world. NVIDIA sees this as the next wave after language AI.</div>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔬</div>
+      <div class="card-title">Regulatory Headwinds</div>
+      <div class="card-desc">NVIDIA faces antitrust scrutiny in the EU, export restrictions on China sales, and ongoing debate about AI's societal impact. The China H200 question remains unresolved as of May 2026 after Jensen's Trump summit visit.</div>
+    </div>
+  </div>
+
+  <div class="big-quote" style="margin-top: 48px;">
+    "NVIDIA went from three guys at a Denny's to the engine of human intelligence. The next chapter hasn't been written yet."
+    <cite>— Summary of 33 years</cite>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-title">NVIDIA — 1993 to ∞</div>
+  <div class="footer-text">Prepared for interview preparation · May 2026 · All figures from public sources</div>
+</footer>
+
+<script>
+  // Nav scroll
+  function scrollTo(id) {
+    document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Nav active state
+  const sections = document.querySelectorAll('section[id]');
+  const navBtns = document.querySelectorAll('.nav-btn');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navBtns.forEach(btn => btn.classList.remove('active'));
+        const id = entry.target.id;
+        const activeBtn = [...navBtns].find(b => b.textContent.toLowerCase().includes(id.split('').slice(0,4).join('')));
+        if (activeBtn) activeBtn.classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(s => observer.observe(s));
+
+  // Animate on scroll
+  const animObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.timeline-item, .card, .arch-card, .founder-block').forEach(el => {
+    animObserver.observe(el);
+  });
+
+  // Animate bars
+  const barObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll('.bar').forEach((bar, i) => {
+          const h = parseFloat(bar.dataset.h);
+          setTimeout(() => {
+            bar.style.height = h + '%';
+          }, i * 80);
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+
+  const barContainer = document.getElementById('bars');
+  if (barContainer) barObserver.observe(barContainer);
+</script>
+</body>
+</html>
